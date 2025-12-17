@@ -29,7 +29,7 @@ export class MonstersService {
     const monster = await this.monsterModel.findById(id).exec();
 
     // si no existe, 404
-    if (!Monster) {
+    if (!monster) {
       throw new NotFoundException(`No se encuentra el monstruo con ID ${id}`);
     }
 
