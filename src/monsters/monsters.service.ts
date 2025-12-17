@@ -2,10 +2,12 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  ConflictException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, isValidObjectId } from 'mongoose';
 import { Monster } from './schemas/monster.schema';
+import { CreateMonsterDto } from './dto/create-monster.dto';
 
 @Injectable()
 export class MonstersService {
@@ -34,5 +36,24 @@ export class MonstersService {
     }
 
     return monster;
+  }
+
+  // para POST /monsters
+  async create(createMonsterDto: CreateMonsterDto) {
+    // verificar si ya existe un monstruo con ese apiId
+    const existingMonster = await this.monsterModel
+      .findOne({ apiId: createMonsterDto.apiId })
+      .exec();
+
+    // Si existe, 409 (conflict)
+    if (existingMonster) {
+      throw new ConflictException(
+        `Ya existe un monstruo con apiId ${createMonsterDto.apiId}`,
+      );
+    }
+
+    // crear el nuevo monstruo
+    const newMonster = new this.monsterModel(createMonsterDto);
+    return await newMonster.save();
   }
 }
