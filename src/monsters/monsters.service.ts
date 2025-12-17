@@ -8,6 +8,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, isValidObjectId } from 'mongoose';
 import { Monster } from './schemas/monster.schema';
 import { CreateMonsterDto } from './dto/create-monster.dto';
+import { UpdateMonsterDto } from './dto/update-monster.dto';
 
 @Injectable()
 export class MonstersService {
@@ -55,5 +56,39 @@ export class MonstersService {
     // crear el nuevo monstruo
     const newMonster = new this.monsterModel(createMonsterDto);
     return await newMonster.save();
+  }
+
+  // para PUT /monsters/:id
+  async update(id: string, updateMonsterDto: UpdateMonsterDto) {
+    // Validar formato de ID
+    if (!isValidObjectId(id)) {
+      const existingMonster = await this.monsterModel
+        .findOne({ apiId: updateMonsterDto.apiId, _id: { $ne: id } })
+        .exec();
+
+      // Si se intenta actualizar el apiId, verificar que no exista otro monstruo con el mismo apiId
+      if (existingMonster) {
+        throw new ConflictException(
+          `Ya existe un monstruo con apiId ${updateMonsterDto.apiId}`,
+        );
+      }
+    }
+
+    // Actualizar el monstruo
+    const updatedMonster = await this.monsterModel
+      .findByIdAndUpdate(id, updateMonsterDto, {
+        new: true, // devolver documento actualizado
+        runValidators: true, // ejecutar validaciones del schema
+      })
+      .exec();
+
+    // si no existe el monstruo, 404
+    if (!updatedMonster) {
+      throw new NotFoundException(
+        `No se encuentra el monstruo con apiId ${id}`,
+      );
+    }
+
+    return updatedMonster;
   }
 }
