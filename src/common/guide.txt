@@ -1,0 +1,9 @@
+common/helpers/ → Lógica relacionada con tu dominio (validaciones, transformaciones de datos)
+
+common/utils/ → Funciones puras sin dependencias (formateo de fechas, strings, números)
+
+common/interceptors/ → Para transformar respuestas HTTP
+
+common/guards/ → Para autenticación/autorización
+
+common/decorators/ → Decoradores personalizados
