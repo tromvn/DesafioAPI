@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import {
   Injectable,
   NotFoundException,
@@ -149,22 +153,20 @@ export class MonstersService {
     }
 
     // traer datos de la API externa
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const externalData = await this.fetchFromExternalApi(apiId);
 
     // Mapear los datos al formato del schema
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     const monsterData = {
-      apiId: externalData.id,
-      name: externalData.name,
-      level: externalData.stats?.level,
-      hp: externalData.stats?.health,
-      baseExp: externalData.stats?.baseExperience,
-      jobExp: externalData.stats?.jobExperience,
+      apiId: externalData.monster_id,
+      name: externalData.monster_info,
+      level: parseInt(externalData.main_stats?.level) || 0,
+      hp: parseInt(externalData.main_stats?.hp) || 0,
+      baseExp: parseInt(externalData.main_stats?.base_exp) || 0,
+      jobExp: parseInt(externalData.main_stats?.job_exp) || 0,
       drops:
         externalData.drops?.map((drop) => ({
-          itemName: drop.item?.name || 'Unknown',
-          chance: drop.chance || 0,
+          itemName: drop.name || 'Unknown',
+          chance: drop.rate || 0,
         })) || [],
     };
 
