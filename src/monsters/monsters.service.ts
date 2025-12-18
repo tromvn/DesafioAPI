@@ -9,6 +9,7 @@ import { Model, isValidObjectId } from 'mongoose';
 import { Monster } from './schemas/monster.schema';
 import { CreateMonsterDto } from './dto/create-monster.dto';
 import { UpdateMonsterDto } from './dto/update-monster.dto';
+import { validarFormatoId } from 'src/common/helpers/validation.helper';
 
 @Injectable()
 export class MonstersService {
@@ -24,9 +25,7 @@ export class MonstersService {
   // para GET /monsters/:id
   async findOne(id: string) {
     // validar id
-    if (!isValidObjectId(id)) {
-      throw new BadRequestException(`Formato de ID inválido: ${id}`);
-    }
+    validarFormatoId(id);
 
     // buscar monstruo
     const monster = await this.monsterModel.findById(id).exec();
@@ -61,9 +60,8 @@ export class MonstersService {
   // para PUT /monsters/:id
   async update(id: string, updateMonsterDto: UpdateMonsterDto) {
     // Validar formato de ID
-    if (!isValidObjectId(id)) {
-      throw new BadRequestException(`Formato de ID inválido: ${id}`);
-    }
+    validarFormatoId(id);
+
     // si se intenta actualizar el apiId, verificar que no exista otro monstruo con el mismo apiId
     if (updateMonsterDto.apiId) {
       const existingMonster = await this.monsterModel
@@ -99,9 +97,7 @@ export class MonstersService {
   // para DELETE /monsters/:id
   async remove(id: string) {
     // validar formato de ID
-    if (!isValidObjectId(id)) {
-      throw new BadRequestException(`Formato de ID inválido ${id}`);
-    }
+    validarFormatoId(id);
 
     // Eliminar el monstruo
     const deletedMonster = await this.monsterModel.findByIdAndDelete(id).exec();
