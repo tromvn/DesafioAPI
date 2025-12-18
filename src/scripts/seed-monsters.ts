@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from '../app.module.ts';
-import { MonstersService } from '../monsters/monsters.service.ts';
+import { AppModule } from '../app.module';
+import { MonstersService } from '../monsters/monsters.service';
 
 async function bootstrap() {
   // Obtener argumentos de la línea de comandos
