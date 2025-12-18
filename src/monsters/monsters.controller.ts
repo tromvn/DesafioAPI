@@ -20,16 +20,22 @@ export class MonstersController {
     return this.monstersService.findAll();
   }
 
-  // GET /monsters/:id
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.monstersService.findOne(id);
+  // POST /monsters/import/:apiId
+  @Post('import/:apiId')
+  importFromApi(@Param('apiId') apiId: string) {
+    return this.monstersService.importFromExternalApi(Number(apiId));
   }
 
   // POST /monsters/
   @Post()
   create(@Body() createMonsterDto: CreateMonsterDto) {
     return this.monstersService.create(createMonsterDto);
+  }
+
+  // GET /monsters/:id
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.monstersService.findOne(id);
   }
 
   // PUT /monsters/:id
