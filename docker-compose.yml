@@ -18,7 +18,7 @@ services:
   api:
     build: .
     container_name: ragnarok-api
-    restart: always
+    restart: unless-stopped
     depends_on:
       - mongodb
     ports:
@@ -27,8 +27,8 @@ services:
       MONGODB_URI: mongodb://admin:password@mongodb:27017/ragnarok?authSource=admin
       PORT: 3000
     volumes:
+      # Solo montar src para desarrollo, no node_modules
       - ./src:/app/src
-    command: npm run start:dev
 
 volumes:
   mongodb_data:
