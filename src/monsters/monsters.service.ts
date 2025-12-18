@@ -62,11 +62,15 @@ export class MonstersService {
   async update(id: string, updateMonsterDto: UpdateMonsterDto) {
     // Validar formato de ID
     if (!isValidObjectId(id)) {
+      throw new BadRequestException(`Formato de ID inválido: ${id}`);
+    }
+    // si se intenta actualizar el apiId, verificar que no exista otro monstruo con el mismo apiId
+    if (updateMonsterDto.apiId) {
       const existingMonster = await this.monsterModel
         .findOne({ apiId: updateMonsterDto.apiId, _id: { $ne: id } })
         .exec();
 
-      // Si se intenta actualizar el apiId, verificar que no exista otro monstruo con el mismo apiId
+      // si existe, 409 conflict
       if (existingMonster) {
         throw new ConflictException(
           `Ya existe un monstruo con apiId ${updateMonsterDto.apiId}`,
@@ -74,7 +78,7 @@ export class MonstersService {
       }
     }
 
-    // Actualizar el monstruo
+    // actualizar el monstruo
     const updatedMonster = await this.monsterModel
       .findByIdAndUpdate(id, updateMonsterDto, {
         new: true, // devolver documento actualizado
