@@ -39,7 +39,7 @@ export class MonstersController {
   }
 
   // DELETE /monsters/:id
-  @Delete('id')
+  @Delete(':id')
   remove(@Param('id') id: string) {
     return this.monstersService.remove(id);
   }
