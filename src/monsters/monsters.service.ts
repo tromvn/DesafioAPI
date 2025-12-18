@@ -13,7 +13,7 @@ import { Model } from 'mongoose';
 import { Monster } from './schemas/monster.schema';
 import { CreateMonsterDto } from './dto/create-monster.dto';
 import { UpdateMonsterDto } from './dto/update-monster.dto';
-import { validarFormatoId } from 'src/common/helpers/validation.helper';
+import { validarFormatoId } from '../common/helpers/validation.helper';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
@@ -154,6 +154,13 @@ export class MonstersService {
 
     // traer datos de la API externa
     const externalData = await this.fetchFromExternalApi(apiId);
+
+    // validar que los datos esenciales existan
+    if (!externalData.monster_id || !externalData.monster_info) {
+      throw new NotFoundException(
+        `Monstruo con apiId ${apiId} no tiene datos válidos en la API externa`,
+      );
+    }
 
     // Mapear los datos al formato del schema
     const monsterData = {
