@@ -1,7 +1,7 @@
 {
   "name": "desafio-api",
-  "version": "0.0.1",
-  "description": "",
+  "version": "1.0.0",
+  "description": "API REST para gestión de monstruos de Ragnarok Online",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
