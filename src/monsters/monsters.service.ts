@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -9,11 +10,15 @@ import { Monster } from './schemas/monster.schema';
 import { CreateMonsterDto } from './dto/create-monster.dto';
 import { UpdateMonsterDto } from './dto/update-monster.dto';
 import { validarFormatoId } from 'src/common/helpers/validation.helper';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
+import { AxiosError } from 'axios';
 
 @Injectable()
 export class MonstersService {
   constructor(
     @InjectModel(Monster.name) private monsterModel: Model<Monster>,
+    private readonly httpService: HttpService,
   ) {}
 
   // para GET /monsters
@@ -107,5 +112,31 @@ export class MonstersService {
     }
 
     return deletedMonster;
+  }
+
+  // para consumir api pública de ragnarok
+  async fetchFromExternalApi(apiId: number): Promise<any> {
+    try {
+      const url = `https://ragnapi.com/api/v1/re-newal/monsters/${apiId}`;
+
+      // petición HTTP
+      const response = await firstValueFrom(this.httpService.get(url));
+
+      return response.data;
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 404) {
+          throw new NotFoundException(
+            `Monstruo con apiId ${apiId} no encontrado en API externa`,
+          );
+        }
+      }
+
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      throw new BadRequestException(
+        `Error buscando monstruo desde API externa: ${errorMessage}`,
+      );
+    }
   }
 }
