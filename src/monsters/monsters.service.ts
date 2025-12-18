@@ -139,4 +139,37 @@ export class MonstersService {
       );
     }
   }
+
+  async importFromExternalApi(apiId: number) {
+    // verificar si ya existe en la base de datos
+    const existingMonster = await this.monsterModel.findOne({ apiId }).exec();
+
+    if (existingMonster) {
+      throw new ConflictException(`Montruo con apiId ${apiId} ya existe`);
+    }
+
+    // traer datos de la API externa
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const externalData = await this.fetchFromExternalApi(apiId);
+
+    // Mapear los datos al formato del schema
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    const monsterData = {
+      apiId: externalData.id,
+      name: externalData.name,
+      level: externalData.stats?.level,
+      hp: externalData.stats?.health,
+      baseExp: externalData.stats?.baseExperience,
+      jobExp: externalData.stats?.jobExperience,
+      drops:
+        externalData.drops?.map((drop) => ({
+          itemName: drop.item?.name || 'Unknown',
+          chance: drop.chance || 0,
+        })) || [],
+    };
+
+    // guardar en la base de datos
+    const newMonster = new this.monsterModel(monsterData);
+    return await newMonster.save();
+  }
 }
