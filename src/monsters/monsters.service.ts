@@ -95,4 +95,22 @@ export class MonstersService {
 
     return updatedMonster;
   }
+
+  // para DELETE /monsters/:id
+  async remove(id: string) {
+    // validar formato de ID
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException(`Formato de ID inválido ${id}`);
+    }
+
+    // Eliminar el monstruo
+    const deletedMonster = await this.monsterModel.findByIdAndDelete(id).exec();
+
+    // si no existe, 404
+    if (!deletedMonster) {
+      throw new NotFoundException(`No se encuentra el monstruo con ID ${id}`);
+    }
+
+    return deletedMonster;
+  }
 }
